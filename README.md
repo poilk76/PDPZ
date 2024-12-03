@@ -5,5 +5,8 @@ Background_task() jest dla ciebie ja tego nie ruszam
 pod 127.0.0.1:8080/ masz sprawdzanie
 a pod 127.0.0.1:8080/test można wywoływać funkcje instrukcja jest w kodzie
 
+Jak masz jakiś pytania to pisz
+
 PS:
 Polskie znaki się psują tylko przez zamianę na stringa ale przy zwykłym urzyciu działają normalnie
+Starą wersję masz dalej w baranchu old 1

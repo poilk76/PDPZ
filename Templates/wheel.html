@@ -1,0 +1,19 @@
+<div class="wheel-border" id="border"></div>
+<div class="wheel-container">
+    <div class="mid"></div>
+    <div class="wheel" id="wheel">
+        <div class="wheel-text" style="transform: rotate(22.5deg) translateX(180px);">{{categories[5]}}</div>
+        <div class="wheel-text" style="transform: rotate(67.5deg) translateX(180px);">{{categories[4]}}</div>
+        <div class="wheel-text" style="transform: rotate(112.5deg) translateX(180px);">{{categories[3]}}</div>
+        <div class="wheel-text" style="transform: rotate(157.5deg) translateX(180px);">{{categories[2]}}</div>
+        <div class="wheel-text" style="transform: rotate(202.5deg) translateX(180px);">{{categories[1]}}</div>
+        <div class="wheel-text" style="transform: rotate(247.5deg) translateX(180px);">{{categories[0]}}</div>
+        <div class="wheel-text" style="transform: rotate(292.5deg) translateX(180px);">{{categories[7]}}</div>
+        <div class="wheel-text" style="transform: rotate(337.5deg) translateX(180px);">{{categories[6]}}</div>
+    </div>
+    <div class="pointer" id="pointer"></div>
+    <img src="{{url_for('static',filename='assets/Tree.svg')}}" id="tree"/>
+    <h1 class="delay">{{winner}}</h1>
+    <h2 class="delay">{{points}} pkt</h2>
+</div>
+<div class="blackout delay"></div>

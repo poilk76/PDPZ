@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="{{url_for('static',filename='css/main.css')}}"/>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/3.0.4/socket.io.js" integrity="sha512-aMGMvNYu8Ue4G+fHa359jcPb1u+ytAF+P2SCb+PxrjCdO3n3ZTxJ30zuH39rimUggmTwmh2u7wvQsDTHESnmfQ==" crossorigin="anonymous"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DynaPuff:wght@400..700&family=Sarala:wght@400;700&family=Spicy+Rice&display=swap" rel="stylesheet">
+</head>
+<body onload="addBackgroundImages()">
+    <div class="background" id="background-id">
+        
+    </div>
+    <div id="content-id" class="sign-container">
+        
+    </div>
+</body>
+<script>
+    const socket = io();
+
+    function sleep(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    socket.on("answer", (data) => {
+        if (data.effect) {
+            document.getElementById("background-id").style.background = "radial-gradient(#A8E69C, #358C24)";
+        }else{
+            document.getElementById("background-id").style.background = "radial-gradient(#F3948F, #CE1F17)";            
+        }
+    })
+
+    socket.on("set", async (data) => {
+        document.getElementById("background-id").style.background = "radial-gradient(#EEF7FF, #70C0F2)";
+        document.getElementById("content-id").innerHTML = data.html;
+        document.getElementById("content-id").className = data.style;
+        if (data.roll){
+            setTimeout(()=>{
+                document.getElementById("tree").style.opacity = "100%";
+            }, 600)
+            setTimeout(() => {
+                document.getElementById("border").style.opacity = "100%";
+            }, 200)
+            setTimeout(() => {
+                document.getElementById("wheel").style.opacity = "100%";
+                document.getElementById("pointer").style.opacity = "100%";
+            }, 800)
+            setTimeout(() => {
+                spin(data.pos);
+            }, 1100);
+            setTimeout(() => {
+                let items = document.getElementsByClassName("delay");
+                for (let i=0;i<items.length;i++){
+                    items.item(i).style.opacity = "100%";
+                }
+            }, 3200)
+        }
+    })
+
+    function addBackgroundImages() {
+        var result = "";
+        const imgs = ["{{url_for('static',filename='assets/Elf.svg')}}","{{url_for('static',filename='assets/Rudolf.svg')}}","{{url_for('static',filename='assets/Santa.svg')}}"];
+        for (i in imgs) {
+            for (let j=0;j<4;j++) {
+                result += '<img src="'+imgs[i]+'" class="bg-image"/>';
+            }
+        }
+        document.getElementById("background-id").innerHTML = result;
+    }
+
+    function random(min,max) {
+        result = Math.floor(Math.random() * (max-min + 1)) + min;
+        return result
+    }
+
+    function moveBottom() {
+        const imgs = document.getElementsByClassName("bg-image");
+        const height = window.innerHeight+60;
+        for (let i=0;i<imgs.length;i++) {
+            var pos_y = parseInt(window.getComputedStyle(imgs.item(i)).top,10);
+            const style = imgs.item(i).style
+            if (pos_y > height) {
+                style.top = '-'+random(100,500)+'px';
+                style.left = random(80, window.innerWidth-80)+'px';
+                const imgHeight = random(60,180);
+                style.height = imgHeight+'px';
+                style.zIndex = imgHeight+'px';
+                style.transform = 'rotate('+random(-30,30)+'deg)';
+                style.filter = 'blur('+250/imgHeight+'px)'
+            }else {
+                const imgHeight = parseInt(window.getComputedStyle(imgs.item(i)).height,10)
+                style.top = (pos_y+(imgHeight/10)/6)+'px';
+            }
+        }
+    }
+
+    function spin(val) {
+        const degree = 22.5 + (val*45) + random(-22,22) + (random(5,18)*360);
+        document.getElementById('wheel').style.transform = 'rotate('+degree+'deg)';
+    }
+
+    setInterval(() => {
+        moveBottom()
+    }, 20);
+</script>
+</html>

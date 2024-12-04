@@ -1,0 +1,130 @@
+:root{
+    --color-1: #fffeed;
+    --color-2: #e7af15;
+    --color-3: 	#d03b3b;
+    --color-4: #901a1a;
+    --color-5: #28543c;
+}
+
+.show {
+    opacity: 0;
+}
+
+.container {
+  display: grid;
+  place-items: center; /* Centers all items */
+  position: relative;
+  height: 100vh;
+}
+
+.container > * {
+  grid-area: 1 / 1; /* Place all elements in the same grid cell */
+}
+
+.wheelBorder{
+    background-color: var(--color-2);
+    width: 40vw;
+    height: 40vw;
+    border-radius: 100%;
+    animation: JumpIn 0.4s ease-in-out 0.2s;
+}
+
+.wheel{
+    width: 37vw;
+    transition: transform 4s cubic-bezier(.2,.86,0,.99);
+    animation: JumpIn 0.8s ease-in-out 0.2s;
+}
+
+.mid{
+    background-color: var(--color-2);
+    width: 3vw;
+    height: 3vw;
+    border-radius: 100%;
+    z-index: 5;
+    animation: FadeIn 0.2s ease-in-out;
+}
+
+.icon{
+    margin-right: 30vw;
+    margin-top: 25vw;
+    height: 20vw;
+    transform: rotate(-15deg);
+    animation: FadeIn 0.3s ease-in-out 0.2s;
+}
+
+.pointer{
+    background-color: rgb(255, 230, 0);
+    clip-path: polygon(50% 0, 0% 100%, 100% 100%);
+    height: 3vw;
+    width: 2vw;
+    border-radius: 25%;
+    transform: rotate(180deg);
+    margin-bottom: 38vw;
+}
+
+.mask {
+    opacity: 0;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 5;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    background-color: rgba(0, 0, 0, 0.6);
+    justify-content: center;
+    font-family: "Sarala", sans-serif;
+    font-weight: 700;
+    color: var(--color-1);
+    animation: JumpIn 0.3s ease-in-out 5.3s;
+}
+
+h1 {
+    font-family: "Spicy Rice", serif;
+    font-weight: 400;
+    font-style: normal;
+    color: var(--color-2);
+    font-size: 8rem;
+}
+
+p {
+    width: 45vw;
+    margin: auto;
+    font-size: 2.8rem;
+    margin-bottom: 30px;
+}
+
+span {
+    font-size: 3.2rem;
+    opacity: 85%;
+}
+
+@keyframes FadeIn {
+    from {
+        opacity: 0;
+    }
+    90%{
+        opacity: 70%;
+    }
+    to{
+        opacity: 100%;
+    }
+}
+
+@keyframes JumpIn{
+    from{
+        transform: scale(0);
+        filter: blur(1px);
+    }
+    80%{
+        transform: scale(1.05);
+        filter: blur(0.5px);
+    }
+    to {
+        transform: scale(1);
+        filter: blur(0);
+    }
+}

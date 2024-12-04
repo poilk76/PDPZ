@@ -1,13 +1,16 @@
 from flask import Flask, request, render_template
 from flask_socketio import SocketIO
 from json import loads
-from random import shuffle
+from random import shuffle, randint
 from multiprocessing import Process,Value
+import time
+import serial
+import requests
 
 class Questions:
 
     def __init__(self):
-        with open("./Static/questions.json", 'r') as f:
+        with open("./Static/questions.json", 'r',encoding="UTF-8") as f:
             self.questions = loads(f.read())
         self.index = 0
         shuffle(self.questions)
@@ -24,46 +27,89 @@ class Questions:
 #Zmienne globalne
 app = Flask(__name__)
 io = SocketIO(app)
+answering = None
+points = 0
 questions = Questions()
 players = [
     {
         "name":"Test",
         "points":0
+    },
+    {
+        "name":"maniek",
+        "points":20
     }
 ]
 
 #Zmienne które działają z procesem seriala
 shared_answerResult = Value('i',-1)
+#stany: 0 - IDLE, 1 - NOWA RUNDA, 2 - CZEKA NA ZGŁOSZENIE, 3 - CZEKA NA DOBRA/ZŁA ODP
+shared_state = Value('i', 0)
 
 #Funkcja która działa jako proces w tle
 def background_task(shared_answerResult):
-    with shared_answerResult.get_lock():
-        shared_answerResult.value = -1
+    serialInst = serial.Serial("COM3")
+    time.sleep(2)
+    while True:
+        if shared_state.value == 1:
+            serialInst.write(b"NR")
+            with shared_state.get_lock():
+                shared_state.value = 2
+        elif shared_state.value == 2:
+            input = serialInst.readline()
+            index = int(input)
+            requests.get(f"http://127.0.0.1:8080/test?func=who&player={index}")
+            with shared_state.get_lock():
+                shared_state.value = 3
+        elif shared_state.value == 3:
+            if shared_answerResult.value == 0:
+                serialInst.write(b"F")
+                with shared_state.get_lock():
+                    shared_state.value = 0
+            elif shared_answerResult.value == 1:
+                serialInst.write(b"T")
+                with shared_state.get_lock():
+                    shared_state.value = 0
 
 #Funkcje które działają na stronie (można ich używać w bacground_task)
 def startGame():
     global questions
+    global points
+    global answering
+    answering = None
     questions.next()
-    shared_answerResult.value = -1
-    data = {"question":questions.value,"html":"TODO"}
-    io.emit("start",f'{data}')
+    with shared_state.get_lock():
+        shared_state.value = 1
+    points = randint(1,5)*100
+    data = {"question":questions.value,"html":render_template("content/wheel.html"),"points":points}
+    io.emit("start",data)
 
 def whoAnswering(index:int):
+    global answering
+    answering = index
     data = {"player":players[index]}
-    io.emit("answering",f'{data}')
+    io.emit("answering",data)
 
 def answerResult(result:bool):
+    if result==1:
+        players[answering]["points"] += points
+    else:
+        players[answering]["points"] -= (points/2)
     shared_answerResult.value = int(result)
     io.emit("result",result)
 
 def pointsTable():
-    data = {"players":players,"html":"TODO"}
-    io.emit("table",f'{data}')
+    data = {"players":sorted(players,key=lambda x: x["points"],reverse=True),"html":render_template("content/table.html")}
+    io.emit("table",data)
 
 #Routy dla weba
 @app.route("/")
 def index():
     return render_template("index.html")
+
+@app.route("/obs")
+def obs():
+    return render_template("obs.html")
 
 #Funkcja do testowania (użycie 127.0.0.1:8080/test?func=[jaka funkcja] ewentualnie + &player=[index] lub &result=[true/false])
 @app.route("/test", methods=['GET'])

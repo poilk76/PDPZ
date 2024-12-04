@@ -1,0 +1,22 @@
+<head>
+    <link rel="stylesheet" type="text/css" href="{{url_for('static',filename='css/wheel.css')}}"/>
+    <meta charset="UTF-8">
+</head>
+<div class="container">
+    <div class="wheelBorder show" ></div>
+    <img class="wheel show" id="wheel" src="{{url_for('static', filename='images/Wheel.svg')}}"/>
+    <div class="mid"></div>
+    <div class="pointer show"></div>
+    <img class="icon show" src="{{url_for('static', filename='images/Tree.svg')}}"/>
+</div>
+<div class="mask" id="mask">
+    <div>
+        <h1>
+           Pytanie:
+        </h1>
+        <span style="color: #e7af15; opacity: 0;" id="answering"></span>
+        <p id="questionText">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce sapien neque, sodales aliquet rutrum et, hendrerit vitae velit. Maecenas condimentum ipsum ac facilisis lacinia. Sed accumsan ipsum mi, ut tincidunt dui tempor eget.</p>
+        <span id="points">200 pkt</span>
+    </div>
+
+</div>

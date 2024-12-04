@@ -1,0 +1,70 @@
+:root{
+    --color-1: #fffeed;
+    --color-2: #e7af15;
+    --color-3: 	#d03b3b;
+    --color-4: #901a1a;
+    --color-5: #28543c;
+}
+
+.box{
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    left: 0;
+    top: 0;
+}
+
+.container{
+    width: 50%;
+    height: 80%;
+    background-color: var(--color-5);
+    margin: auto;
+    border: 8px solid var(--color-2);
+    border-radius: 15px;
+    margin-top: 2.5%;
+    text-align: center;
+    color: var(--color-1);
+    animation: FadeIn 0.3s ease-in-out;
+}
+
+h1{
+    color: var(--color-2);
+    font-family: "Spicy Rice", serif;
+    font-weight: 400;
+    font-style: normal;
+    font-size: 5rem;
+    margin: 20px;
+}
+
+ul{
+    list-style: none;
+    margin: 30px;
+    padding: 0;
+    margin-bottom: 50px;
+}
+
+li{
+    justify-content: center;
+    font-family: "Sarala", sans-serif;
+    font-weight: 700;
+    font-style: normal;
+    font-size: 2.2rem;
+    display: flex;
+    justify-content: space-between;
+}
+
+h2 {
+    margin: 15px;
+}
+
+@keyframes FadeIn {
+    from {
+        opacity: 0;
+    }
+    90%{
+        opacity: 70%;
+    }
+    to{
+        opacity: 100%;
+    }
+}

@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/3.0.4/socket.io.js" integrity="sha512-aMGMvNYu8Ue4G+fHa359jcPb1u+ytAF+P2SCb+PxrjCdO3n3ZTxJ30zuH39rimUggmTwmh2u7wvQsDTHESnmfQ==" crossorigin="anonymous"></script>
+</head>
+<style>
+    *{
+        padding: 0;
+        margin: 0;
+        box-sizing: border-box;
+    }
+    .container{
+        width: 100%;
+        height: 100%;
+        position: fixed;
+        left: 0;
+        top: 0;
+    }
+
+    .container div {
+        display: flex;
+        height: 33.3%;
+        width: 100%;
+        font-size: 1.3rem;
+        text-align: center;
+    }
+    input{
+        position: relative;
+        font-size: 1rem;
+        height: 100%;
+        width: 50%;
+    }
+</style>
+<body>
+    <div class="container">
+        <div>
+            <h1 id="answer">{{answer}}</h1>
+        </div>
+        <div>
+            <input value="start" onclick="start()" type="submit">
+            <input value="tabela" onclick="table()" type="submit">
+        </div>
+        <div id="result" style="opacity: 20%;">
+            <input type="submit" onclick="good()" value="" style="background-color: green;">
+            <input type="submit" onclick="bad()" value="" style="background-color: red;">
+        </div>
+    </div>
+</body>
+<script>
+    const socket = io();
+    var canResult = false
+
+    socket.on("answering",()=>{
+        document.getElementById("result").style.opacity = "100%"
+        canResult = true
+    })
+
+    socket.on("start",(data)=>{
+        document.getElementById("answer").innerHTML = data.question.answer
+    })
+
+    async function start(){
+        await fetch("/test?func=start");
+        document.getElementById("result").style.opacity = "20%"
+        canResult = false
+    }
+    async function table() {
+        await fetch("/test?func=table");
+        document.getElementById("result").style.opacity = "20%"
+        canResult = false
+    }
+    async function good() {
+        await fetch("/test?func=result&result=1")
+        document.getElementById("result").style.opacity = "20%"
+        canResult = false 
+    }
+    async function bad() {
+        await fetch("/test?func=result&result=0")
+        document.getElementById("result").style.opacity = "20%"
+        canResult = false
+    }
+</script>
+</html>

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<style>
+    *{
+        font-size: 1.4rem;
+    }
+    input{
+        font-size: 1.4rem;
+    }
+    ul{
+        list-style: none;
+    }
+</style>
+<body>
+    <ul>
+        {%for i in range(len)%}
+        <li><input type="text" value="{{players[i].name}}" id="name{{i}}" onchange="name({{i}})"><input type="text" value="{{players[i].points}}" id="points{{i}}" onchange="points({{i}})"><input type="submit" value="del" onclick="del({{i}})"></li>
+        {%endfor%}
+        <li><input value="add" type="submit" onclick="add()"></li>
+    </ul>
+</body>
+<script>
+    async function name(i) {
+        await fetch("/players?func=name&index="+i+"&value="+document.getElementById("name"+i).value);
+        location.reload();
+    }
+    async function points(i) {
+        await fetch("/players?func=points&index="+i+"&value="+document.getElementById("points"+i).value);
+        location.reload();
+    }
+    async function del(i) {
+        await fetch("/players?func=del&index="+i);
+        location.reload();
+    }
+    async function add(i) {
+        await fetch("/players?func=add")
+        location.reload();
+    }
+</script>
+</html>

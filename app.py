@@ -78,11 +78,12 @@ def startGame():
     global answering
     answering = None
     questions.next()
-    with shared_state.get_lock():
-        shared_state.value = 1
     points = randint(1,5)*100
     data = {"question":questions.value,"html":render_template("content/wheel.html"),"points":points}
     io.emit("start",data)
+    time.sleep(3.2)
+    with shared_state.get_lock():
+        shared_state.value = 1
 
 def whoAnswering(index:int):
     global answering
@@ -91,25 +92,45 @@ def whoAnswering(index:int):
     io.emit("answering",data)
 
 def answerResult(result:bool):
-    if result==1:
-        players[answering]["points"] += points
-    else:
-        players[answering]["points"] -= (points/2)
-    shared_answerResult.value = int(result)
-    io.emit("result",result)
+    global answering
+    if answering != None:
+        if result==1:
+            players[answering]["points"] += points
+        else:
+            players[answering]["points"] -= (points/2)
+        shared_answerResult.value = int(result)
+        io.emit("result",result)
+        answering = None
 
 def pointsTable():
-    data = {"players":sorted(players,key=lambda x: x["points"],reverse=True),"html":render_template("content/table.html")}
-    io.emit("table",data)
+    if answering == None:
+        data = {"players":sorted(players,key=lambda x: x["points"],reverse=True),"html":render_template("content/table.html")}
+        io.emit("table",data)
 
 #Routy dla weba
 @app.route("/")
 def index():
     return render_template("index.html")
 
-@app.route("/obs")
+@app.route("/admin")
 def obs():
-    return render_template("obs.html")
+    return render_template("admin.html",len=len(players),players=players)
+
+@app.route("/phone")
+def phone():
+    return render_template("phone.html",answer=questions.value["answer"])
+
+@app.route("/players", methods=['GET'])
+def playersChanger():
+    match request.args["func"]:
+        case "add":
+            players.append({"name":"Gracz","points":500})
+        case "del":
+            players.pop(int(request.args["index"]))
+        case "name":
+            players[int(request.args["index"])]["name"] = request.args["value"]
+        case "points":
+            players[int(request.args["index"])]["points"] = int(request.args["value"])
 
 #Funkcja do testowania (użycie 127.0.0.1:8080/test?func=[jaka funkcja] ewentualnie + &player=[index] lub &result=[true/false])
 @app.route("/test", methods=['GET'])

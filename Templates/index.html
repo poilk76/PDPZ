@@ -66,10 +66,9 @@
 
     socket.on("result", (data)=>{
         if (data == 1){
-            document.getElementById("questionText").style.color = "#e3fade"
             document.getElementById("background-id").style.background = "radial-gradient(#A8E69C, #358C24)";
         }else{
-            document.getElementById("questionText").style.color = "#ffd9d9"
+
             document.getElementById("background-id").style.background = "radial-gradient(#F3948F, #CE1F17)";
         }
     })

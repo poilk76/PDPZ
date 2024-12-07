@@ -36,14 +36,35 @@
         return result
     }
 
+    let index
+    let interval
+    let question
+
+    async function nameWrite(text) {
+
+        question = text
+
+        clearInterval(interval)
+
+        interval = setInterval(()=>{
+            if (index < text.length) {
+                document.getElementById("questionText").innerHTML += text[index]
+                index++
+            } else {
+                clearInterval(interval)
+            }
+        },80)
+    }
+
     socket.on("start",(data)=>{
         document.getElementById("background-id").style.background = "radial-gradient(#EEF7FF, #70C0F2)";
         document.getElementById("content").innerHTML = data.html;
-        document.getElementById("questionText").innerText = data.question.text;
         document.getElementById("points").innerText = data.points+" pkt";
         console.log(data.question.category)
         setTimeout(()=>{
             document.getElementById("mask").style.opacity = "100%"
+            index=0
+            nameWrite(data.question.text);
         },5330)
         setTimeout(()=>{
             var toShow = document.getElementsByClassName("show")
@@ -59,6 +80,7 @@
 
     socket.on("answering", (data)=>{
         const element = document.getElementById("answering")
+        clearInterval(interval)
 
         element.style.opacity = "100%"
         element.innerText = "Odpowiada: "+data.player.name
@@ -71,6 +93,7 @@
 
             document.getElementById("background-id").style.background = "radial-gradient(#F3948F, #CE1F17)";
         }
+        nameWrite(question)
     })
 
     socket.on("table",(data)=>{

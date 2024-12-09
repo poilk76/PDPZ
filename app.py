@@ -1,6 +1,6 @@
 from flask import Flask, request, render_template
 from flask_socketio import SocketIO
-from json import loads
+from json import loads, dumps
 from random import shuffle, randint
 from multiprocessing import Process,Value
 import time
@@ -30,16 +30,8 @@ io = SocketIO(app)
 answering = None
 points = 0
 questions = Questions()
-players = [
-    {
-        "name":"Test",
-        "points":0
-    },
-    {
-        "name":"maniek",
-        "points":20
-    }
-]
+with open("./Static/players.json", "r", encoding="utf-8") as f:
+    players = loads(f.read())
 
 #Zmienne które działają z procesem seriala
 shared_answerResult = Value('i',-1)
@@ -47,8 +39,8 @@ shared_answerResult = Value('i',-1)
 shared_state = Value('i', 0)
 
 #Funkcja która działa jako proces w tle
-def background_task(shared_answerResult):
-    serialInst = serial.Serial("COM3")
+def background_task(shared_answerResult, shared_state):
+    serialInst = serial.Serial("COM5")
     time.sleep(2)
     while True:
         if shared_state.value == 1:
@@ -76,12 +68,14 @@ def startGame():
     global questions
     global points
     global answering
+    with shared_answerResult.get_lock():
+        shared_answerResult.value = -1
     answering = None
     questions.next()
     points = randint(1,5)*100
     data = {"question":questions.value,"html":render_template("content/wheel.html"),"points":points}
     io.emit("start",data)
-    time.sleep(3.2)
+    time.sleep(4.8)
     with shared_state.get_lock():
         shared_state.value = 1
 
@@ -94,7 +88,7 @@ def whoAnswering(index:int):
 def answerResult(result:bool):
     global answering
     if answering != None:
-        if result==1:
+        if int(result)==1:
             players[answering]["points"] += points
         else:
             players[answering]["points"] -= (points/2)
@@ -131,6 +125,7 @@ def playersChanger():
             players[int(request.args["index"])]["name"] = request.args["value"]
         case "points":
             players[int(request.args["index"])]["points"] = int(request.args["value"])
+    return "Done!"
 
 #Funkcja do testowania (użycie 127.0.0.1:8080/test?func=[jaka funkcja] ewentualnie + &player=[index] lub &result=[true/false])
 @app.route("/test", methods=['GET'])
@@ -149,11 +144,14 @@ def test():
 
 if __name__ == "__main__":
 
-    background_process = Process(target=background_task, args=(shared_answerResult,))
+    background_process = Process(target=background_task, args=(shared_answerResult, shared_state))
     background_process.start()
 
     app.run(host="0.0.0.0", port=8080, debug=True, use_reloader=False)
 
     background_process.join()
+
+    with open("./Static/players.json", "w", encoding="utf-8") as f:
+        f.write(dumps(players))
 
     print("Closed correctly!")
